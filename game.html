@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #fff;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #ff9966, #ff5e62);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 35px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 2px 5px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.4s ease-in-out, background 0.4s ease-in-out;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+            background: #2ecc71;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <h1>Memory Game</h1>
+    <div class="game-container">
+        <div class="game-info">
+            <div>Time: <span id="time">0</span>s</div>
+            <div>Moves: <span id="moves">0</span></div>
+        </div>
+        <div id="grid" class="grid"></div>
+        <button id="start">Start Game</button>
+    </div>
+
+    <script>
+        const grid = document.getElementById('grid');
+        const startButton = document.getElementById('start');
+        const timeDisplay = document.getElementById('time');
+        const movesDisplay = document.getElementById('moves');
+
+        let cards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+        let time = 0;
+        let timer;
+        let gameStarted = false;
+
+        const emojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮'];
+        let difficulty = 4;
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function createCard(emoji) {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.dataset.emoji = emoji;
+            card.addEventListener('click', flipCard);
+            return card;
+        }
+
+        function flipCard() {
+            if (!gameStarted) return;
+            if (flippedCards.length < 2 && !this.classList.contains('flipped')) {
+                this.classList.add('flipped');
+                this.textContent = this.dataset.emoji;
+                flippedCards.push(this);
+
+                if (flippedCards.length === 2) {
+                    moves++;
+                    movesDisplay.textContent = moves;
+                    checkMatch();
+                }
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            if (card1.dataset.emoji === card2.dataset.emoji) {
+                matchedPairs++;
+                flippedCards = [];
+                if (matchedPairs === cards.length / 2) {
+                    endGame();
+                }
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    card1.textContent = '';
+                    card2.textContent = '';
+                    flippedCards = [];
+                }, 1000);
+            }
+        }
+
+        function startGame() {
+            grid.innerHTML = '';
+            cards = [];
+            flippedCards = [];
+            matchedPairs = 0;
+            moves = 0;
+            time = 0;
+            gameStarted = true;
+
+            const pairs = emojis.slice(0, (difficulty * difficulty) / 2);
+            const gameEmojis = shuffleArray([...pairs, ...pairs]);
+
+            grid.style.gridTemplateColumns = `repeat(${difficulty}, 1fr)`;
+
+            gameEmojis.forEach(emoji => {
+                const card = createCard(emoji);
+                cards.push(card);
+                grid.appendChild(card);
+            });
+
+            movesDisplay.textContent = moves;
+            timeDisplay.textContent = time;
+
+            clearInterval(timer);
+            timer = setInterval(() => {
+                time++;
+                timeDisplay.textContent = time;
+            }, 1000);
+
+            startButton.textContent = 'Restart Game';
+        }
+
+        function endGame() {
+            clearInterval(timer);
+            gameStarted = false;
+            alert(`🎉 Congratulations! You won in ${time} seconds with ${moves} moves.`);
+            difficulty = Math.min(difficulty + 2, 8);
+            startButton.textContent = 'Start Next Level';
+        }
+
+        startButton.addEventListener('click', startGame);
+    </script>
+</body>
+</html>
