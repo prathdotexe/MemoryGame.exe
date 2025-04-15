@@ -1,6 +1,7 @@
 # Memory Game 🎮🧠
 
-![Memory Game Banner](https://example.com/memory-game-banner.png) *Replace with actual image URL*
+![image](https://github.com/user-attachments/assets/8c7ab592-7fd5-43c0-bec5-7a1899644125)
+
 
 An engaging and interactive memory-matching game built with modern web technologies. Test your memory by matching pairs of emoji cards with increasing difficulty across multiple levels!
 
