@@ -216,14 +216,6 @@ We welcome contributions! Here's how you can help:
 - [ ] 💎 Premium themes and card packs
 - [ ] 📈 Performance analytics
 
-## 📊 Performance
-
-### Lighthouse Scores
-- 🎯 **Performance**: 98/100
-- ♿ **Accessibility**: 95/100
-- 🔍 **Best Practices**: 100/100
-- 📱 **PWA**: 100/100
-
 ### Bundle Size
 - 📦 **Total Size**: ~25KB (gzipped)
 - 🎨 **CSS**: ~8KB
